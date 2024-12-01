@@ -1,0 +1,11 @@
+﻿{usingNames}
+
+using {namespace}.Repositories.Interface;
+
+namespace {namespace}.Data.Entities
+{
+    public partial class {ClassModel}
+    {
+        {renderModel}
+    }
+}

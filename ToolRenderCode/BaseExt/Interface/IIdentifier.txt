@@ -1,0 +1,7 @@
+﻿namespace {namespace}.BaseExt.Interface
+{
+    public interface IIdentifier<TKey>
+    {
+        TKey Id { get; set; }
+    }
+}

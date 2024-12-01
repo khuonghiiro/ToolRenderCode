@@ -1,0 +1,74 @@
+﻿using {namespace}.Configurations;
+using {namespace}.Services;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc;
+using {namespace}.BaseExt;
+using Newtonsoft.Json;
+
+namespace {namespace}.Authorize
+{
+    public class BaseExtAuthorizeAttribute : Attribute, IAuthorizationFilter
+    {
+        private const string CHECK_PERMISSION_FAILED = "CHECK_PERMISSION_FAILED";
+
+        /// <summary>
+        /// Danh sách mã code để kiểm tra quyền.
+        /// </summary>
+        private readonly string _functionCode;
+
+        public BaseExtAuthorizeAttribute(string functionCode)
+        {
+            _functionCode = functionCode;
+        }
+
+        public void OnAuthorization(AuthorizationFilterContext context)
+        {
+            var httpContext = context.HttpContext;
+            var service = (IAuthenticateService)httpContext.RequestServices.GetService(typeof(IAuthenticateService));
+
+            // Lấy UserId từ request
+            long userId = GetUserIdFromRequest(httpContext);
+
+            // Trường hợp đặc biệt: user là admin
+            if (userId == long.MaxValue && Permission.ARRROLE.Contains(_functionCode))
+                return;
+
+            // Kiểm tra quyền
+            bool hasPermission = service.CheckPermission(_functionCode, userId);
+            if (!hasPermission)
+            {
+                //context.Result = new UnauthorizedResult(); // Trả về lỗi 401
+                context.Result = Forbidden(_functionCode);
+            }
+        }
+
+        private long GetUserIdFromRequest(HttpContext context)
+        {
+            var currentUser = context.User;
+            long userId = -1;
+
+            if (currentUser.HasClaim(c => c.Type == "UserId"))
+            {
+                string value = currentUser.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
+                userId = long.Parse(value);
+            }
+
+            return userId;
+        }
+
+        private ObjectResult Forbidden(string functionCode)
+        {
+            var response = new BaseResponse<string>
+            {
+                data = functionCode,
+                Code = CHECK_PERMISSION_FAILED,
+                Message = string.Format("You are not allowed to access function {0}", functionCode)
+            };
+
+            return new ObjectResult(response)
+            {
+                StatusCode = StatusCodes.Status200OK // Trả về mã HTTP 403
+            };
+        }
+    }
+}

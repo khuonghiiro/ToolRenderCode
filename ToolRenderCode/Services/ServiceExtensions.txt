@@ -1,0 +1,28 @@
+﻿using {namespace}.BaseExt.Interface;
+using {namespace}.BaseExt;
+using {namespace}.Data.Entities;
+using {namespace}.Repositories.Interface;
+using {namespace}.Repositories;
+using Microsoft.EntityFrameworkCore;
+
+namespace {namespace}.Services
+{
+    public static class ServiceExtensions
+    {
+        /// <summary>
+        /// Đăng ký các base hỗ trợ 
+        /// </summary>
+        /// <param name="services"></param>
+        public static void AddCustomScopedServices(this IServiceCollection services)
+        {
+            // Đăng ký AutoMapper
+            // AutoMapper sẽ tự động tìm và đăng ký tất cả các lớp kế thừa từ Profile trong các assembly được tải 
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            // Đăng ký các service
+            services.AddScoped(typeof(ICommonRepository), typeof(CommonRepository<{namespace}.Data.Entities.{namespaceCut}DbContext, {namespace}.Data.Entities.User, long>));
+            services.AddScoped<IBaseService, BaseService>();
+            services.AddScoped<CommonService>();
+        }
+    }
+}

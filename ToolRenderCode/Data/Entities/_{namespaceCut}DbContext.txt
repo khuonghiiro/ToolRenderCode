@@ -1,0 +1,50 @@
+﻿using {namespace}.Migrations;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+
+namespace {namespace}.Data.Entities
+{
+    // lưu trữ và quản lý các khóa bảo vệ dữ liệu một cách an toàn trong cơ sở dữ liệu, 
+    // hỗ trợ tính năng bảo mật và bảo vệ dữ liệu cho ứng dụng ASP.NET Core
+    // Install-Package Microsoft.AspNetCore.DataProtection.EntityFrameworkCore -Version x.x.x 
+    // (x.x.x là phiên bản khớp với .net đang dùng, ví dụ: .net6.0 => 6.0.0)
+    public class {namespaceCut}DbContext : DbContext, IDataProtectionKeyContext
+    {
+        public {namespaceCut}DbContext()
+        {
+        }
+
+        public {namespaceCut}DbContext(DbContextOptions<{namespaceCut}DbContext> options)
+            : base(options)
+        {
+        }
+        
+        // Bảng DataProtectionKeys trong cơ sở dữ liệu, nơi chứa các khóa bảo vệ dữ liệu
+        public virtual DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
+
+        //{KhongXoaDoanCommentNay}
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            #region Cấu hình để nhận ánh xạ tên, ví dụ: User => Users
+            var mutableProperties = modelBuilder.Model.GetEntityTypes()
+            .SelectMany(e => e.GetProperties().Where(p => p.ClrType == typeof(string)));
+
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof({namespaceCut}DbContext).Assembly);
+            base.OnModelCreating(modelBuilder);
+            #endregion
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            //if (!optionsBuilder.IsConfigured)
+            //{
+                //optionsBuilder.UseSqlServer("Server = localhost; Database = Database1; User Id = sa; Password = Ab@123456; Encrypt=false; TrustServerCertificate=True");
+            //}
+        }
+    }
+}

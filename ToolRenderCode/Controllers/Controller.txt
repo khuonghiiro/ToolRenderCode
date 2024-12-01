@@ -1,0 +1,96 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using {namespace}.BaseExt;
+using {namespace}.Services;
+using {namespace}.Repositories;
+using {namespace}.Authorize;
+using {namespace}.Dtos.{ClassModel};
+using {namespace}.Repositories.Interface;
+using {namespace}.Data.Entities;
+using {namespace}.Data.Enums;
+
+namespace {namespace}.Controllers
+{
+    [Produces("application/json")]
+    [Route("api/{ClassModelRoute}")]
+    [Authorize]
+    public class {ClassModel}Controller : BaseController
+    {
+        private CommonService _baseService;
+        private readonly IUserIdentity<long> _userIdentity;
+
+        public {ClassModel}Controller(CommonService baseService, IUserIdentity<long> userIdentity)
+        {
+            _baseService = baseService;
+            _userIdentity = userIdentity;
+        }
+
+        //list all
+        [BaseAuthorize("{ClassModelLower}", PrivilegeListEnum.List)]
+        [HttpGet]
+        public async Task<IActionResult> GetLists([FromQuery]{ClassModel}GridPaging pagingModel)
+        {
+            var predicates = pagingModel.GetPredicates();
+            var result = await _baseService.FilterPagedAsync<{ClassModel}, {ClassModel}GridDto>(pagingModel, predicates.ToArray());
+            return Ok(result);
+        }
+
+        //detail
+        [BaseAuthorize("{ClassModelLower}", PrivilegeListEnum.Detail)]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(long id)
+        {
+            return Ok(await _baseService.FindAsync<{ClassModel}, {ClassModel}DetailDto>(id));
+        }
+
+        //create
+        [BaseAuthorize("{ClassModelLower}, PrivilegeListEnum.Add")]
+        [HttpPost]
+        public async Task<IActionResult> Create({ClassModel}CreateDto {ClassModel}CreateDto)
+        {
+            await _baseService.CreateAsync<{ClassModel}, {ClassModel}CreateDto>({ClassModel}CreateDto);
+            return Ok();
+        }
+
+        //update
+        [BaseAuthorize("{ClassModelLower}", PrivilegeListEnum.Edit)]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(long id, {ClassModel}UpdateDto {ClassModel}UpdateDto)
+        {
+            await _baseService.UpdateAsync<{ClassModel}, {ClassModel}UpdateDto>(id, {ClassModel}UpdateDto);
+            return Ok(true);
+        }
+
+        [BaseAuthorize("{ClassModelLower}", PrivilegeListEnum.Delete)]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(long id)
+        {
+            await _baseService.DeleteAsync<{ClassModel}, long>(id);
+			
+            return Ok(true);
+        }
+
+        //multiple delete 
+        [BaseAuthorize("{ClassModelLower}", PrivilegeListEnum.Delete)]
+        [HttpDelete]
+        public async Task<IActionResult> Deletes(string ids)
+        {
+            if (string.IsNullOrEmpty(ids))
+            {
+                return BadRequest();
+            }
+            try
+            {
+                var {ClassModel}Ids = ids.Split(',').Select(x => Convert.ToInt64(x)).ToArray();
+                await _baseService.DeleteAsync<{ClassModel}, long>({ClassModel}Ids);
+               
+                return Ok(true);
+                
+            }
+            catch (FormatException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }       
+    }
+}

@@ -1,0 +1,26 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using {namespace}.Repositories.Interface;
+
+namespace {namespace}.Repositories
+{
+    public abstract class FullTableInfo<Tkey> : IIdentifier<Tkey>, IDeleteInfo<long>, ICreateInfo<long>, IUpdateInfo<long> where Tkey : struct
+    {
+        public DateTime? DeletedDate { get; set; }
+
+        public int? DeletedUserId { get; set; }
+
+        public DateTime? LastUpdatedDate { get; set; }
+
+        public int? LastUpdatedUserId { get; set; }
+
+        public DateTime? CreatedDate { get; set; }
+
+        public int? CreatedUserId { get; set; }
+
+        public Tkey Id { get; set; }
+    }
+}

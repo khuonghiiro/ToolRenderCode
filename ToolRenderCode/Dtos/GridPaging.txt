@@ -1,0 +1,23 @@
+﻿using JetBrains.Annotations;
+using System.Linq.Expressions;
+using {namespace}.Pages;
+
+namespace {namespace}.Dtos.{ClassModel}
+{
+    public class {ClassModel}GridPaging : PagingParams<{ClassModel}GridDto>
+    {
+        public string? Text { get; set; }
+
+        public override List<Expression<Func<{ClassModel}GridDto, bool>>> GetPredicates()
+        {
+            var predicates = base.GetPredicates();
+
+            if (!string.IsNullOrEmpty(Text))
+            {
+                // ví dụ
+                //predicates.Add(x => x.Title.Contains(Text)|| x.Code.Contains(Text));
+            }            
+            return predicates;
+        }
+    }
+}

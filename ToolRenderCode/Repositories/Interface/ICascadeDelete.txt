@@ -1,0 +1,7 @@
+﻿namespace {namespace}.Repositories.Interface
+{
+    public interface ICascadeDelete
+    {
+        void OnDelete();
+    }
+}

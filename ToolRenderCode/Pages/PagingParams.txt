@@ -1,0 +1,38 @@
+﻿using System.Linq.Expressions;
+
+namespace {namespace}.Pages
+{
+
+    public class PagingParams<TDto>
+    {
+        public static int DefaultPageSize = 10;
+
+        public string SortExpression => (string.IsNullOrEmpty(SortBy) ? "ID" : SortBy) + " " + (SortDesc ? "desc" : "asc");
+
+        public string SortBy { get; set; }
+
+        public bool SortDesc { get; set; }
+
+        public int ItemsPerPage { get; set; }
+
+        public int PageNumber { get; set; }
+
+        public int StartingIndex => ItemsPerPage * (PageNumber - 1);
+
+        public int Start { get; set; }
+
+        public PagingParams()
+        {
+            SortBy = "Id";
+            SortDesc = true;
+            ItemsPerPage = DefaultPageSize;
+            PageNumber = 0;
+        }
+
+        public virtual List<Expression<Func<TDto, bool>>> GetPredicates()
+        {
+            return new List<Expression<Func<TDto, bool>>>();
+        }
+    }
+
+}

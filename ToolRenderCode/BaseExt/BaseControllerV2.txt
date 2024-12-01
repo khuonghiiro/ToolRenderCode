@@ -1,0 +1,69 @@
+﻿using {namespace}.Configurations;
+using {namespace}.Repositories.Interface;
+using {namespace}.Services;
+using Microsoft.AspNetCore.Mvc;
+using System.Security;
+
+namespace {namespace}.BaseExt
+{
+    public class BaseController : Controller
+    {
+        protected long GetUserIdFromRequest()
+        {
+            var currentUser = HttpContext.User;
+            long UserId = -1;
+            if (currentUser.HasClaim(c => c.Type == "UserId"))
+            {
+                string value = currentUser.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
+                UserId = long.Parse(value);
+            }
+            return UserId;
+        }
+        protected string? GetUserCodeFromRequest()
+        {
+            var currentUser = HttpContext.User;
+            string? UserCode = null;
+            if (currentUser!= null && currentUser.HasClaim(c => c.Type == "Code"))
+            {
+                UserCode = currentUser.Claims.FirstOrDefault(c => c.Type == "Code").Value;
+            }
+            return UserCode;
+        }
+        protected bool CheckPermission(string functionCode)
+        {
+            long userId = GetUserIdFromRequest();
+            if (userId == long.MaxValue && Permission.ARRROLE.Contains(functionCode))
+                return true;
+
+            IAuthenticateService _service = (IAuthenticateService)HttpContext.RequestServices.GetService(typeof(IAuthenticateService));
+            return _service.CheckPermission(functionCode, userId);
+        }
+        protected const string CHECK_PERMISSION_FAILED = "CHECK_PERMISSION_FAILED";
+        protected OkObjectResult Forbidden(string functionCode)
+        {
+            BaseResponse<string> response = new BaseResponse<string>
+            {
+                data = functionCode,
+                Code = CHECK_PERMISSION_FAILED,
+                Message = String.Format("You are not allowed to access funtion {0}", functionCode)
+            };
+            return Ok(response);
+        }
+
+        private Lazier<IUserIdentity<long>>? _userIdentity;
+
+        protected IUserIdentity<long> UserIdentity
+        {
+            get
+            {
+                if (_userIdentity == null)
+                {
+                    _userIdentity = new Lazier<IUserIdentity<long>>(base.HttpContext.RequestServices);
+                }
+
+                return _userIdentity.Value;
+            }
+        }
+    }
+
+}

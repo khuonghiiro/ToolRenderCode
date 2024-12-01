@@ -1,0 +1,24 @@
+﻿using AutoMapper;
+using {namespace}.Data.Entities;
+using {namespace}.Dtos.{ClassModel};
+
+namespace {namespace}.Profiles
+{
+    public class {ClassModel}DtoToEntity : Profile
+    {
+        public {ClassModel}DtoToEntity()
+        {
+            CreateMap<{ClassModel}CreateDto, {ClassModel}>();
+            CreateMap<{ClassModel}UpdateDto, {ClassModel}>();           
+        }
+    }
+
+    public class {ClassModel}EntityToDto : Profile
+    {
+        public {ClassModel}EntityToDto()
+        {
+            CreateMap<{ClassModel}, {ClassModel}GridDto>();
+            CreateMap<{ClassModel}, {ClassModel}DetailDto>();
+        }
+    }
+}

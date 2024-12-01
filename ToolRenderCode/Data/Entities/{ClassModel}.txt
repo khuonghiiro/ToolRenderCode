@@ -1,0 +1,8 @@
+﻿{usingNames}
+
+using {namespace}.Repositories.Interface;
+
+namespace {namespace}.Data.Entities
+{
+    {renderModelAll}
+}

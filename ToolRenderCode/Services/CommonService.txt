@@ -1,0 +1,23 @@
+﻿using AutoMapper.QueryableExtensions;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using {namespace}.Pages;
+using {namespace}.Data.Entities;
+using System;
+using Newtonsoft.Json;
+using System.Linq.Expressions;
+using System.Linq.Dynamic.Core;
+using {namespace}.BaseExt;
+using {namespace}.Repositories.Interface;
+
+namespace {namespace}.Services
+{
+    public class CommonService : BaseService
+    {
+        public CommonService(ICommonRepository repository, IMapper mapper)
+       : base(repository, mapper)
+        {
+        }
+
+    }
+}
